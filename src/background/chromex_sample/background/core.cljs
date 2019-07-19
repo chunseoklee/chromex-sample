@@ -23,13 +23,14 @@
 
 
 (defn run-notification-loop []
-  (go-loop [noto-id 1]
+  (go-loop [noti-id (rand)]
     (<! (timeout 10000))
     ;;(windows/create (js-obj "url" "https://github.sec.samsung.net/notifications"))
     (go (let [response (<! (http/get "https://github.sec.samsung.net/api/v3/notifications"
-                                     {:with-credentials? true
-                                      :headers {"authorization"  "token 60cd823e11d4736431c9d0037470779df34e57f5"}}))]
-          (prn (:status response))
+                                     {:with-credentials? false
+                                      :headers {"authorization"  "token f929ff9f4a01b12e7e70af8ad42cd846347f5cbf"
+                                                "Cache-Control" "no-store, no-cache, must-revalidate, post-check=0, pre-check=0"}}))]
+          (prn (str noti-id))
           (let [mention (mention-count (:body response))
                 rr (rr-count (:body response))
                 notis (count (:body response))]
@@ -39,8 +40,9 @@
                                         "message" (str mention " mention(s)\n"
                                                        rr " review request(s)\n"
                                                        notis " notifications")
-                                        "title" "Review Time")))))
-    (recur (inc noti-id))))
+                                        "title" "Review Time"
+                                        "requireInteraction" false)))))
+    (recur (rand))))
 
 (defn init! []
   (log "BACKGROUND: init")
