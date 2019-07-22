@@ -26,9 +26,9 @@
   (go-loop [noti-id (rand)]
     (<! (timeout 10000))
     ;;(windows/create (js-obj "url" "https://github.sec.samsung.net/notifications"))
-    (go (let [response (<! (http/get "https://github.sec.samsung.net/api/v3/notifications"
+    (go (let [response (<! (http/get "https://api.github.com/notifications"
                                      {:with-credentials? false
-                                      :headers {"authorization"  "token f929ff9f4a01b12e7e70af8ad42cd846347f5cbf"
+                                      :headers {"authorization"  "token e6eb656562117f50e4eb172382a6b84ff9d526b0"
                                                 "Cache-Control" "no-store, no-cache, must-revalidate, post-check=0, pre-check=0"}}))]
           (prn (str noti-id))
           (let [mention (mention-count (:body response))
