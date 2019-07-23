@@ -9,7 +9,9 @@
             [chromex.ext.tabs :as tabs]
             [chromex.ext.runtime :as runtime]
             [chromex.ext.windows :as windows]
-            [chromex.ext.notifications :as noti]))
+            [chromex.ext.notifications :as noti]
+            [chromex.ext.storage :as storage]
+            [chromex.protocols.chrome-storage-area :refer [get set]]))
 
 (def clients (atom []))
 
@@ -22,9 +24,9 @@
           (map #(if (= (:reason %) "review_requested") 1 0) coll)))
 
 
-(defn run-notification-loop []
+(defn run-notification-loop [interval]
   (go-loop [noti-id (rand)]
-    (<! (timeout 10000))
+    (<! (timeout (* interval 1000)))
     ;;(windows/create (js-obj "url" "https://github.sec.samsung.net/notifications"))
     (go (let [response (<! (http/get "https://api.github.com/notifications"
                                      {:with-credentials? false
@@ -46,4 +48,11 @@
 
 (defn init! []
   (log "BACKGROUND: init")
-  (run-notification-loop))
+  (go
+    (let [[[items] error] (<! (get (storage/get-sync) "fetch_interval"))]
+        (if error
+          (prn "error")
+          (prn (get (js->clj items) "fetch_interval")))))
+  (run-notification-loop 10))
+   
+          
